@@ -131,7 +131,7 @@ cobre o mesmo intervalo tem zero linhas para esses concursos.
 
 ## Por que o dado bruto vai versionado no repositório
 
-`data/bronze/` tem 647 parquets e 137 MB. É o resultado de uma coleta
+`data/bronze/` tem 653 parquets e 137 MB. É o resultado de uma coleta
 histórica que levou cerca de **16 horas** por causa do limite de requisições da
 Caixa.
 
@@ -142,9 +142,10 @@ Mantenho no Git porque:
 - quem quiser o dataset baixa junto com o código, sem passo extra;
 - o projeto roda de ponta a ponta **sem encostar na API da Caixa**.
 
-Não é um repositório que recebe commit de dado todo dia: é um backfill
-histórico, commitado uma vez. As atualizações incrementais do dia a dia ficam
-locais.
+Não é um repositório que recebe commit de dado todo dia. O backfill histórico
+entrou num commit só, e o snapshot é atualizado junto com a volumetria do
+README, para o que o README descreve ser exatamente o que o repositório traz.
+Entre uma atualização e outra, os incrementos diários ficam locais.
 
 Cabe com folga — o limite do GitHub é 100 MB por arquivo e o maior parquet
 aqui tem 2,8 MB.
@@ -154,6 +155,37 @@ O que **não** vai pro Git:
 - `data/silver/` (104 MB) — reproduzível a partir do bronze em cerca de 10
   minutos;
 - `data/_cache/` — o cadastro de municípios do IBGE, que rebaixa em segundos.
+
+---
+
+## Por que o bronze nunca é corrigido
+
+Toda correção — moeda, nome de cidade, local do sorteio, data do próximo
+concurso — acontece do silver em diante. O bronze guarda a resposta da API
+exatamente como veio, erros incluídos.
+
+É o que permite errar na correção e voltar atrás: se uma regra do silver
+estiver errada, basta consertá-la e reprocessar. Se o bronze fosse corrigido
+no lugar, o dado original estaria perdido junto com o erro.
+
+Pelo mesmo motivo, o registro de cada arquivo guarda o caminho relativo à raiz
+do projeto (`data/bronze/...`): o bronze é reprocessável de qualquer máquina,
+seja o Windows, seja o container do Airflow.
+
+---
+
+## Por que o gold atualiza valores ao reprocessar
+
+A carga do gold usava `ON CONFLICT DO NOTHING` em tudo: se o concurso já
+existia, a linha nova era descartada. Com isso, uma correção no silver nunca
+chegava ao banco, e cada correção precisava de um reparo escrito à mão.
+
+Hoje a carga do concurso e do rateio atualiza os valores monetários, e o local
+do sorteio é preenchido só quando está ausente. O resto — dezenas, ganhadores,
+faixas — continua `DO NOTHING`, porque não muda depois do sorteio.
+
+A regra geral virou: o silver é a fonte da verdade do dado tratado, e
+reprocessar a partir do bronze basta para o gold refletir uma correção.
 
 ---
 

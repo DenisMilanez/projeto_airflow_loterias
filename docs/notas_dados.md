@@ -210,3 +210,31 @@ com folga de 0,05 sobre o segundo candidato da mesma UF.
 
 Ficou de fora `VARZEA GRANDE/CE`, que não existe no Ceará e pode ser a do
 Piauí ou a do Mato Grosso.
+
+---
+
+## 10. Moeda e arrecadação
+
+**Cruzeiro Real.** A Quina começou em 13/03/1994, antes do Plano Real. Os
+concursos 1 a 28 (até 26/06/1994) trazem todos os valores em CR$: prêmio,
+estimativa e acumulado. O silver divide por 2.750, a paridade fixada na
+entrada do Real em 01/07/1994. Nenhuma outra modalidade tem concurso anterior
+a essa data.
+
+**Arrecadação.** `valorArrecadado` só vem preenchido a partir de meados de
+2009; antes disso a API devolve `0`. Como concurso nenhum arrecada zero, o
+silver trata como ausente.
+
+| Modalidade | Primeira arrecadação informada |
+|---|---|
+| QUINA | 1996, esporádica; contínua a partir de 2009 |
+| MEGA_SENA | 1998, esporádica; contínua a partir de 2009 |
+| LOTOMANIA | 2007, esporádica; contínua a partir de 2009 |
+| LOTOFACIL | 2009 |
+
+Consequência para análise: retorno de prêmios sobre arrecadação só faz
+sentido comparando os dois no mesmo conjunto de concursos.
+
+**Local do sorteio vazio.** Quando a API manda a cidade mas não o nome do
+local, o silver registra o local `NAO INFORMADO` naquela cidade, para a cidade
+não se perder (393 concursos).

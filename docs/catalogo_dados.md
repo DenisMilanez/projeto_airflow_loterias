@@ -11,13 +11,13 @@ Camada **Gold** da arquitetura medallion — dados ja limpos e normalizados, pro
 | `tipo_jogo` | 4 | Catalogo das modalidades (Mega-Sena, Quina, etc) e suas regras (quantas dezenas sao sorteadas, apostadas e disponiveis). |
 | `faixa` | 19 | Faixas de premiacao de cada modalidade (ex: 6 acertos, 5 acertos...). O campo 'acertos' e o numero de acertos daquela faixa. |
 | `localidade` | 5,590 | Municipio + UF. UF '--' = canal eletronico (compra online, sem cidade fisica). |
-| `local_sorteio` | 692 | Local fisico onde o sorteio ocorreu (ex: CAMINHAO DA SORTE, ESTUDIO DE TV). |
-| `concurso` | 16,955 | Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz data de apuracao, se acumulou, valores arrecadados/estimados, etc. |
-| `dezena` | 170,402 | Dezenas sorteadas. 1 LINHA POR DEZENA de cada concurso (nao por concurso). Para jogos com 2 sorteios, 'segundo_sorteio'=true marca as do 2o. |
-| `rateio` | 72,155 | Resultado financeiro por faixa de premiacao de cada concurso: quantos ganhadores e quanto cada um levou. |
-| `ganhador_municipio` | 16,226 | De quais municipios sairam os ganhadores de cada concurso (fonte: API de concursos). |
-| `loterica` | 48,953 | Loterica fisica ou canal de venda (nome fantasia, canal de vendas). |
-| `ganhador_loterica` | 3,054,218 | MAIOR TABELA. Ganhadores rastreados a nivel de loterica especifica (fonte: API 'locais da sorte'). Liga concurso + loterica + faixa. |
+| `local_sorteio` | 694 | Local fisico onde o sorteio ocorreu (ex: CAMINHAO DA SORTE, ESTUDIO DE TV). |
+| `concurso` | 16,958 | Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz data de apuracao, se acumulou, valores arrecadados/estimados, etc. |
+| `dezena` | 170,442 | Dezenas sorteadas. 1 LINHA POR DEZENA de cada concurso (nao por concurso). Para jogos com 2 sorteios, 'segundo_sorteio'=true marca as do 2o. |
+| `rateio` | 72,171 | Resultado financeiro por faixa de premiacao de cada concurso: quantos ganhadores e quanto cada um levou. |
+| `ganhador_municipio` | 16,227 | De quais municipios sairam os ganhadores de cada concurso (fonte: API de concursos). |
+| `loterica` | 48,957 | Loterica fisica ou canal de venda (nome fantasia, canal de vendas). |
+| `ganhador_loterica` | 3,054,637 | MAIOR TABELA. Ganhadores rastreados a nivel de loterica especifica (fonte: API 'locais da sorte'). Liga concurso + loterica + faixa. |
 
 ## Relacionamentos (chaves estrangeiras)
 
@@ -135,7 +135,7 @@ Municipio + UF. UF '--' = canal eletronico (compra online, sem cidade fisica).
 ]
 ```
 
-### `local_sorteio`  (692 linhas)
+### `local_sorteio`  (694 linhas)
 
 Local fisico onde o sorteio ocorreu (ex: CAMINHAO DA SORTE, ESTUDIO DE TV).
 
@@ -162,7 +162,7 @@ Local fisico onde o sorteio ocorreu (ex: CAMINHAO DA SORTE, ESTUDIO DE TV).
 ]
 ```
 
-### `concurso`  (16,955 linhas)
+### `concurso`  (16,958 linhas)
 
 Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz data de apuracao, se acumulou, valores arrecadados/estimados, etc.
 
@@ -197,59 +197,59 @@ Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz
 ```json
 [
   {
-    "id_concurso": 135,
-    "id_tipo_jogo": 4,
-    "numero_concurso": 135,
-    "data_apuracao": "2001-07-28",
-    "data_proximo_concurso": "2001-08-01",
-    "numero_concurso_anterior": 134,
-    "numero_concurso_proximo": 136,
-    "numero_concurso_final_0_5": null,
-    "id_local_sorteio": 79,
+    "id_concurso": 7001,
+    "id_tipo_jogo": 2,
+    "numero_concurso": 1501,
+    "data_apuracao": "2005-09-20",
+    "data_proximo_concurso": "2005-09-22",
+    "numero_concurso_anterior": 1500,
+    "numero_concurso_proximo": 1502,
+    "numero_concurso_final_0_5": 1505,
+    "id_local_sorteio": 35,
     "acumulado": false,
     "ultimo_concurso": true,
     "indicador_concurso_especial": 1,
     "tipo_publicacao": 3,
-    "numero_jogo": 16,
-    "observacao": "Estimativa prêmio próximo concurso: 20 acertos-R$550.000,00 e zero acerto-R$200.000,00.",
-    "valor_arrecadado": 0.0,
+    "numero_jogo": 3,
+    "observacao": "Estimativa de prêmio (QUINA) para o próximo concurso, a ser realizado em 22/09/2005: R$300.000,00.",
+    "valor_arrecadado": null,
     "valor_estimado_proximo_concurso": 0.0,
     "valor_acumulado_proximo_concurso": 0.0,
     "valor_acumulado_concurso_especial": 0.0,
     "valor_acumulado_concurso_0_5": 0.0,
     "valor_saldo_reserva_garantidora": 0.0,
     "valor_total_premio_faixa_um": 0.0,
-    "created_at": "2026-09-12T23:27:24.450146+00:00"
+    "created_at": "2026-09-12T23:28:42.120251+00:00"
   },
   {
-    "id_concurso": 136,
-    "id_tipo_jogo": 4,
-    "numero_concurso": 136,
-    "data_apuracao": "2001-08-01",
-    "data_proximo_concurso": "2001-08-04",
-    "numero_concurso_anterior": 135,
-    "numero_concurso_proximo": 137,
-    "numero_concurso_final_0_5": null,
-    "id_local_sorteio": 55,
-    "acumulado": false,
+    "id_concurso": 7002,
+    "id_tipo_jogo": 2,
+    "numero_concurso": 1502,
+    "data_apuracao": "2005-09-22",
+    "data_proximo_concurso": "2005-09-24",
+    "numero_concurso_anterior": 1501,
+    "numero_concurso_proximo": 1503,
+    "numero_concurso_final_0_5": 1505,
+    "id_local_sorteio": 35,
+    "acumulado": true,
     "ultimo_concurso": true,
     "indicador_concurso_especial": 1,
     "tipo_publicacao": 3,
-    "numero_jogo": 16,
-    "observacao": "Estimativa do prêmio próximo concurso: 20 acertos: R$ 700 MIL - zero acerto: R$ 400 MIL.",
-    "valor_arrecadado": 0.0,
+    "numero_jogo": 3,
+    "observacao": "Acumulou!! Estimativa de prêmio (QUINA) para o próximo concurso, a ser realizado em 24/09/2005: R$700.000,00.",
+    "valor_arrecadado": null,
     "valor_estimado_proximo_concurso": 0.0,
-    "valor_acumulado_proximo_concurso": 0.0,
+    "valor_acumulado_proximo_concurso": 307887.3,
     "valor_acumulado_concurso_especial": 0.0,
     "valor_acumulado_concurso_0_5": 0.0,
     "valor_saldo_reserva_garantidora": 0.0,
     "valor_total_premio_faixa_um": 0.0,
-    "created_at": "2026-09-12T23:27:24.450146+00:00"
+    "created_at": "2026-09-12T23:28:42.120251+00:00"
   }
 ]
 ```
 
-### `dezena`  (170,402 linhas)
+### `dezena`  (170,442 linhas)
 
 Dezenas sorteadas. 1 LINHA POR DEZENA de cada concurso (nao por concurso). Para jogos com 2 sorteios, 'segundo_sorteio'=true marca as do 2o.
 
@@ -285,7 +285,7 @@ Dezenas sorteadas. 1 LINHA POR DEZENA de cada concurso (nao por concurso). Para 
 ]
 ```
 
-### `rateio`  (72,155 linhas)
+### `rateio`  (72,171 linhas)
 
 Resultado financeiro por faixa de premiacao de cada concurso: quantos ganhadores e quanto cada um levou.
 
@@ -303,25 +303,25 @@ Resultado financeiro por faixa de premiacao de cada concurso: quantos ganhadores
 ```json
 [
   {
-    "id_rateio": 1,
-    "id_concurso": 1,
-    "id_faixa": 1,
-    "numero_ganhadores": 0,
-    "valor_premio": 0.0,
-    "valor_total": 0.0
+    "id_rateio": 27767,
+    "id_concurso": 6454,
+    "id_faixa": 14,
+    "numero_ganhadores": 234,
+    "valor_premio": 2063.73,
+    "valor_total": 482912.82
   },
   {
-    "id_rateio": 2,
-    "id_concurso": 1,
-    "id_faixa": 2,
-    "numero_ganhadores": 1,
-    "valor_premio": 118746.87,
-    "valor_total": 118746.87
+    "id_rateio": 27768,
+    "id_concurso": 6454,
+    "id_faixa": 15,
+    "numero_ganhadores": 9154,
+    "valor_premio": 25.0,
+    "valor_total": 228850.0
   }
 ]
 ```
 
-### `ganhador_municipio`  (16,226 linhas)
+### `ganhador_municipio`  (16,227 linhas)
 
 De quais municipios sairam os ganhadores de cada concurso (fonte: API de concursos).
 
@@ -360,7 +360,7 @@ De quais municipios sairam os ganhadores de cada concurso (fonte: API de concurs
 ]
 ```
 
-### `loterica`  (48,953 linhas)
+### `loterica`  (48,957 linhas)
 
 Loterica fisica ou canal de venda (nome fantasia, canal de vendas).
 
@@ -393,7 +393,7 @@ Loterica fisica ou canal de venda (nome fantasia, canal de vendas).
 ]
 ```
 
-### `ganhador_loterica`  (3,054,218 linhas)
+### `ganhador_loterica`  (3,054,637 linhas)
 
 MAIOR TABELA. Ganhadores rastreados a nivel de loterica especifica (fonte: API 'locais da sorte'). Liga concurso + loterica + faixa.
 

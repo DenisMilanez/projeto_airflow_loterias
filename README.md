@@ -119,37 +119,41 @@ limite de requisições da Caixa, e é dado público.
 
 | | |
 |---|---|
-| Arquivos | 647 parquets |
+| Arquivos | 653 parquets |
 | Tamanho | 137 MB (maior arquivo: 2,8 MB) |
-| Concursos | 16.955 |
-| Coleta | 27/05/2026 a 25/09/2026 |
+| Concursos | 16.958 |
+| Coleta | 27/05/2026 a 27/09/2026 |
 | Fontes | `servicebus2` (concursos) e `servicebus3` (locais da sorte) |
 
 | Modalidade | Concursos | Faixa | Período |
 |---|---:|---|---|
 | MEGA_SENA | 3.062 | 1–3062 | 11/03/1996 a 24/09/2026 |
-| QUINA | 7.126 | 1–7126 | 13/03/1994 a 24/09/2026 |
-| LOTOFACIL | 3.788 | 1–3788 | 29/09/2003 a 24/09/2026 |
-| LOTOMANIA | 2.979 | 1–2979 | 02/10/1999 a 23/09/2026 |
+| QUINA | 7.127 | 1–7127 | 13/03/1994 a 25/09/2026 |
+| LOTOFACIL | 3.789 | 1–3789 | 29/09/2003 a 25/09/2026 |
+| LOTOMANIA | 2.980 | 1–2980 | 02/10/1999 a 25/09/2026 |
 
 Timemania e Dupla Sena estão fora — o motivo está em
 [docs/decisoes.md](docs/decisoes.md).
+
+Todos os valores estão em Real nominal. Os concursos 1 a 28 da Quina, de antes
+do Plano Real, são convertidos de Cruzeiro Real no silver. A arrecadação por
+concurso só existe a partir de 2009; antes disso fica ausente, não zero.
 
 Processando esse bronze do zero, o gold fica assim:
 
 | Tabela | Linhas |
 |---|---:|
-| `ganhador_loterica` | 3.054.218 |
-| `dezena` | 170.402 |
-| `rateio` | 72.155 |
-| `loterica` | 48.953 |
-| `concurso` | 16.955 |
-| `ganhador_municipio` | 16.226 |
+| `ganhador_loterica` | 3.054.637 |
+| `dezena` | 170.442 |
+| `rateio` | 72.171 |
+| `loterica` | 48.957 |
+| `concurso` | 16.958 |
+| `ganhador_municipio` | 16.227 |
 | `localidade` | 5.590 |
-| `local_sorteio` | 692 |
+| `local_sorteio` | 694 |
 
-O silver intermediário tem 4.499.060 linhas de `ganhador_loterica`; o gold
-chega a 3.054.218 porque os arquivos bronze se sobrepõem em faixas de concurso
+O silver intermediário tem 4.499.537 linhas de `ganhador_loterica`; o gold
+chega a 3.054.637 porque os arquivos bronze se sobrepõem em faixas de concurso
 e a carga deduplica por `(concurso, lotérica, faixa, tipo de aposta)`.
 
 `data/silver/` e `data/_cache/` não vão pro repositório: o silver é
@@ -343,6 +347,67 @@ exatamente as mesmas linhas.
 O verificador de saúde degrada se aparecer nome a corrigir e lista o que ficou
 fora do IBGE. `tests/test_normalizacao.py` trava as regras e a unificação.
 
+### 9. Prêmios de 1994 em Cruzeiro Real somados como se fossem Real
+
+O mart de resumo dizia que a Quina devolvia **94%** do que arrecadava, e que o
+maior prêmio dela tinha sido de **R$ 579 milhões**. As duas coisas eram falsas.
+
+A Quina começou em março de 1994, antes do Plano Real. Os concursos 1 a 28
+têm valores em **Cruzeiro Real**, e o pipeline somava tudo como Real. Os
+"R$ 579 milhões" eram CR$ 579 milhões — uns R$ 210 mil pela conversão oficial
+de 2.750 CR$ para R$ 1. Esses 28 concursos inflavam o total pago pela Quina em
+R$ 24,5 bilhões, mais da metade do valor.
+
+Havia um segundo problema no mesmo número: a API só informa a arrecadação de
+cada concurso a partir de meados de 2009 e devolve **zero** para os anteriores.
+O pipeline gravava esse zero, e o retorno dividia prêmios desde 1994 por
+arrecadação desde 2009.
+
+A conversão acontece no silver, logo depois do dado bruto: valores de
+concursos anteriores a 01/07/1994 são divididos por 2.750 (`loterias/silver/moeda.py`).
+O bronze continua exatamente como a API entregou. A arrecadação zero vira
+ausente, e o pandera passou a exigir arrecadação maior que zero quando
+informada.
+
+### 10. A cidade do sorteio sumia quando o local vinha em branco
+
+O concurso só alcança a cidade através do local do sorteio. Quando a API
+mandava a cidade mas deixava o nome do local vazio, não havia local para
+criar, e a cidade se perdia no caminho: 393 concursos tinham a cidade no
+bronze e nenhuma no banco.
+
+Agora esses concursos recebem o local `NAO INFORMADO` na cidade certa — a mesma
+convenção já usada para município vazio.
+
+Os bugs 9 e 10 expuseram um problema de desenho no gold: a carga fazia
+`ON CONFLICT DO NOTHING`, então uma correção no silver nunca chegava ao banco,
+e cada correção anterior tinha precisado de um reparo escrito à mão. A carga
+passou a atualizar os valores monetários e a preencher o local ausente. Com
+isso, corrigir o silver e reprocessar a partir do bronze basta:
+
+```bash
+loterias-admin arquivo resetar --camada prata --fonte concursos
+python -m loterias.silver.concursos
+python -m loterias.gold.concursos
+```
+
+Os 17 mil concursos reprocessaram em 4 minutos, com concursos, dezenas, rateios
+e ganhadores terminando com exatamente as mesmas linhas.
+`tests/test_moeda_e_local.py` trava a conversão, a arrecadação e o local.
+
+### 11. O caminho do arquivo dependia de onde o código rodou
+
+Esse apareceu justamente no reprocessamento: 30 dos 102 arquivos falharam com
+`Bronze nao encontrado`. O registro de cada parquet guardava o caminho
+absoluto de quem o coletou — `D:\projetos\...` quando foi o Windows,
+`/opt/loterias/...` quando foi o container do Airflow. Cada lado só conseguia
+reprocessar o que ele mesmo tinha baixado.
+
+O registro passou a guardar o caminho relativo à raiz do projeto
+(`data/bronze/...`), e a leitura resolve qualquer formato, inclusive os
+antigos (`loterias/caminhos.py`). Os 653 registros existentes foram
+normalizados, e `tests/test_caminhos.py` trava os três formatos.
+
 ---
 
 ## CLI de administração
@@ -360,7 +425,8 @@ loterias-admin fila resetar    --de erro|processando|abandonado
                                [--modalidade X | --todas] [--fonte Y]
                                [--dias N] [--manter-tentativas] [--dry-run]
 
-loterias-admin arquivo resetar --camada prata|ouro [--id-inicio N --id-fim N] [--dry-run]
+loterias-admin arquivo resetar --camada prata|ouro [--id-inicio N --id-fim N]
+                               [--fonte concursos|locais_sorte] [--dry-run]
 
 loterias-admin db testar
 loterias-admin db catalogo     [--bancos]
