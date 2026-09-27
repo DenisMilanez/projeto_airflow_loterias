@@ -44,12 +44,12 @@ dbt docs generate && dbt docs serve
 |---|---|---|
 | `mart_resumo_modalidade` | modalidade | Volumetria, arrecadação, prêmios pagos e percentual de retorno |
 | `mart_ganhadores_municipio` | uf + município + modalidade | Ganhadores e concursos premiados por cidade |
-| `mart_premiacao_faixa` | modalidade + faixa | Prêmio médio e máximo, concursos com e sem ganhador |
+| `mart_premiacao_faixa` | modalidade + acertos | Prêmio médio, mediano e máximo por ganhador, concursos com e sem ganhador |
 | `mart_serie_mensal` | modalidade + mês | Série temporal com arrecadação acumulada em window function |
 
 ## Testes
 
-30 testes: `unique`, `not_null`, `relationships` nas sources, e de `dbt_utils`
+33 testes: `unique`, `not_null`, `relationships` nas sources, e de `dbt_utils`
 o `unique_combination_of_columns` no grão de cada mart mais `accepted_range`
 nos percentuais.
 

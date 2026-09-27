@@ -52,17 +52,28 @@ models:
         tests: [not_null]
 
   - name: mart_premiacao_faixa
-    description: Estatistica de premiacao por modalidade e faixa de acertos.
+    description: >
+      Premiacao por modalidade e numero de acertos. Uma linha por acertos, mesmo
+      quando a Caixa renumerou a faixa ao longo do tempo (Lotomania, 0 acertos).
     tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
-            combination_of_columns: [modalidade, numero_faixa]
+            combination_of_columns: [modalidade, acertos]
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "premio_mediano_por_ganhador <= maior_premio"
     columns:
       - name: modalidade
         tests: [not_null]
-      - name: numero_faixa
+      - name: acertos
         tests: [not_null]
       - name: concursos_com_ganhador
+        tests: [not_null]
+      - name: premio_medio_por_ganhador
+        description: Total pago dividido pelo total de ganhadores.
+        tests: [not_null]
+      - name: premio_mediano_por_ganhador
+        description: Metade dos ganhadores levou menos que isso, metade levou mais.
         tests: [not_null]
 
   - name: mart_serie_mensal
