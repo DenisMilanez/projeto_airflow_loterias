@@ -2,7 +2,10 @@ version: 2
 
 models:
   - name: mart_resumo_modalidade
-    description: Uma linha por modalidade com volumetria, arrecadacao e retorno em premios.
+    description: >
+      Uma linha por modalidade com volumetria, arrecadacao e retorno em premios.
+      A arrecadacao so e informada pela Caixa a partir de 2009; o retorno compara
+      premios e arrecadacao apenas nos concursos que tem os dois.
     columns:
       - name: modalidade
         tests: [unique, not_null]
@@ -18,6 +21,18 @@ models:
               arguments:
                 min_value: 0
                 max_value: 100
+      - name: concursos_com_arrecadacao
+        tests: [not_null]
+      - name: pct_retorno
+        description: Premios pagos sobre arrecadacao, so nos concursos com arrecadacao informada.
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+      - name: total_ganhadores
+        description: Apostas premiadas somando todas as faixas, nao pessoas distintas.
 
   - name: mart_ganhadores_municipio
     description: Ganhadores por municipio, UF e modalidade.
@@ -31,6 +46,9 @@ models:
       - name: municipio
         tests: [not_null]
       - name: total_ganhadores
+        tests: [not_null]
+      - name: municipio_identificado
+        description: Falso para NAO INFORMADO e canal eletronico; use como filtro de mapa.
         tests: [not_null]
 
   - name: mart_premiacao_faixa

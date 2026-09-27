@@ -12,7 +12,7 @@ select
     date_trunc('month', c.data_apuracao)::date as mes_apuracao,
     extract(year from c.data_apuracao)::int  as ano_apuracao,
     c.acumulado,
-    coalesce(c.valor_arrecadado, 0)          as valor_arrecadado,
+    c.valor_arrecadado,
     coalesce(c.valor_acumulado_proximo_concurso, 0) as valor_acumulado_proximo
 from fonte c
 join {{ source('gold', 'tipo_jogo') }} tj using (id_tipo_jogo)

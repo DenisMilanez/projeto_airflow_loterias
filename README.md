@@ -522,9 +522,13 @@ cd dbt && dbt deps && dbt build
 | `mart_premiacao_faixa` | modalidade + faixa |
 | `mart_serie_mensal` | modalidade + mês |
 
-São 26 testes dbt: `unique`, `not_null`, `relationships`,
+São 30 testes dbt: `unique`, `not_null`, `relationships`,
 `unique_combination_of_columns` e `accepted_range`. Detalhes em
 [dbt/README.md](dbt/README.md).
+
+O retorno em prêmios compara prêmios e arrecadação só nos concursos que têm os
+dois, porque a Caixa só informa a arrecadação a partir de 2009. O próprio dbt
+concede leitura ao usuário `metabase`, que é o que ferramentas de BI usam.
 
 ---
 

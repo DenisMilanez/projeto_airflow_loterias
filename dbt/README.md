@@ -49,7 +49,7 @@ dbt docs generate && dbt docs serve
 
 ## Testes
 
-26 testes: `unique`, `not_null`, `relationships` nas sources, e de `dbt_utils`
+30 testes: `unique`, `not_null`, `relationships` nas sources, e de `dbt_utils`
 o `unique_combination_of_columns` no grão de cada mart mais `accepted_range`
 nos percentuais.
 

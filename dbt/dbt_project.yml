@@ -10,9 +10,14 @@ clean-targets: ["target", "dbt_packages"]
 
 models:
   loterias:
+    +grants:
+      select: ["metabase"]
     staging:
       +materialized: view
       +schema: staging
     marts:
       +materialized: table
       +schema: marts
+
+on-run-end:
+  - "{% for schema in schemas %}grant usage on schema {{ schema }} to metabase;{% endfor %}"
