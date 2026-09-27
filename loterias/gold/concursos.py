@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 from psycopg2.extras import execute_batch
 
+from loterias import caminhos
 from loterias.db import conexao, devolver, emprestar
 from loterias.gold import data_proximo, normalizacao
 from loterias.log import aviso, evento, log, secao, set_context
@@ -55,6 +56,17 @@ def _int_or_none(v) -> int | None:
     except (TypeError, ValueError):
         pass
     return int(v)
+
+
+def _num_or_none(v) -> float | None:
+    if v is None:
+        return None
+    try:
+        if pd.isna(v):
+            return None
+    except (TypeError, ValueError):
+        pass
+    return float(v)
 
 
 def fetch_arquivos_prata_concluidos(
@@ -286,13 +298,13 @@ class GoldLoader:
                     _int_or_none(r.get("tipo_publicacao")),
                     _int_or_none(r.get("numero_jogo")),
                     r.get("observacao"),
-                    r.get("valor_arrecadado"),
-                    r.get("valor_estimado_proximo_concurso"),
-                    r.get("valor_acumulado_proximo_concurso"),
-                    r.get("valor_acumulado_concurso_especial"),
-                    r.get("valor_acumulado_concurso_0_5"),
-                    r.get("valor_saldo_reserva_garantidora"),
-                    r.get("valor_total_premio_faixa_um"),
+                    _num_or_none(r.get("valor_arrecadado")),
+                    _num_or_none(r.get("valor_estimado_proximo_concurso")),
+                    _num_or_none(r.get("valor_acumulado_proximo_concurso")),
+                    _num_or_none(r.get("valor_acumulado_concurso_especial")),
+                    _num_or_none(r.get("valor_acumulado_concurso_0_5")),
+                    _num_or_none(r.get("valor_saldo_reserva_garantidora")),
+                    _num_or_none(r.get("valor_total_premio_faixa_um")),
                 )
             )
 
@@ -313,7 +325,17 @@ class GoldLoader:
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                     %s, %s, %s, %s, %s, %s
                 )
-                ON CONFLICT (id_tipo_jogo, numero_concurso) DO NOTHING
+                ON CONFLICT (id_tipo_jogo, numero_concurso) DO UPDATE SET
+                    id_local_sorteio = COALESCE(
+                        public.concurso.id_local_sorteio, EXCLUDED.id_local_sorteio
+                    ),
+                    valor_arrecadado = EXCLUDED.valor_arrecadado,
+                    valor_estimado_proximo_concurso = EXCLUDED.valor_estimado_proximo_concurso,
+                    valor_acumulado_proximo_concurso = EXCLUDED.valor_acumulado_proximo_concurso,
+                    valor_acumulado_concurso_especial = EXCLUDED.valor_acumulado_concurso_especial,
+                    valor_acumulado_concurso_0_5 = EXCLUDED.valor_acumulado_concurso_0_5,
+                    valor_saldo_reserva_garantidora = EXCLUDED.valor_saldo_reserva_garantidora,
+                    valor_total_premio_faixa_um = EXCLUDED.valor_total_premio_faixa_um
                 """,
                 concurso_rows,
             )
@@ -372,8 +394,8 @@ class GoldLoader:
                     cid,
                     fid,
                     r.get("numero_ganhadores"),
-                    r.get("valor_premio"),
-                    r.get("valor_total"),
+                    _num_or_none(r.get("valor_premio")),
+                    _num_or_none(r.get("valor_total")),
                 )
             )
         if rat_rows:
@@ -385,7 +407,9 @@ class GoldLoader:
                         id_concurso, id_faixa, numero_ganhadores, valor_premio, valor_total
                     )
                     VALUES (%s, %s, %s, %s, %s)
-                    ON CONFLICT (id_concurso, id_faixa) DO NOTHING
+                    ON CONFLICT (id_concurso, id_faixa) DO UPDATE SET
+                        valor_premio = EXCLUDED.valor_premio,
+                        valor_total = EXCLUDED.valor_total
                     """,
                     rat_rows,
                 )
@@ -454,7 +478,7 @@ def main() -> int:
         for id_arquivo, caminho, ci, cf in arquivos:
             secao(f"gold arquivo id={id_arquivo} concursos {ci}-{cf}")
             update_status_ouro(id_arquivo, "processando")
-            silver_dir = bronze_to_silver_dir(Path(caminho))
+            silver_dir = bronze_to_silver_dir(caminhos.localizar(caminho))
             if not silver_dir.is_dir():
                 msg = f"pasta silver nao encontrada: {silver_dir}"
                 aviso(msg)

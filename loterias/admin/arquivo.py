@@ -23,6 +23,7 @@ def resetar(
     id_inicio: int | None = None,
     id_fim: int | None = None,
     dry_run: bool = False,
+    fonte: str | None = None,
 ) -> ResultadoResetArquivo:
     if camada not in CAMADAS:
         raise CamadaInvalida(f"camada '{camada}' invalida; use {' ou '.join(CAMADAS)}")
@@ -40,6 +41,9 @@ def resetar(
         parametros += [id_inicio, id_fim]
     elif id_inicio is not None or id_fim is not None:
         raise ValueError("informe --id-inicio e --id-fim juntos, ou nenhum dos dois")
+    if fonte is not None:
+        condicao += " AND fonte = %s"
+        parametros.append(fonte)
 
     with conexao() as conn, conn.cursor() as cur:
         cur.execute(f"SELECT COUNT(*) FROM pipeline.execucao_arquivo WHERE {condicao}", parametros)

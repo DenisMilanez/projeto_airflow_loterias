@@ -203,10 +203,15 @@ def arquivo_resetar(
     camada: Annotated[Camada, typer.Option("--camada", help="Camada a resetar")],
     id_inicio: Annotated[int | None, typer.Option("--id-inicio")] = None,
     id_fim: Annotated[int | None, typer.Option("--id-fim")] = None,
+    fonte: Annotated[
+        Fonte | None, typer.Option("--fonte", help="Só os arquivos desta fonte")
+    ] = None,
     dry_run: OpcaoDryRun = False,
 ) -> None:
     try:
-        resultado = mod_arquivo.resetar(camada.value, id_inicio, id_fim, dry_run)
+        resultado = mod_arquivo.resetar(
+            camada.value, id_inicio, id_fim, dry_run, fonte.value if fonte else None
+        )
     except (mod_arquivo.CamadaInvalida, ValueError) as e:
         _abortar(str(e))
         return

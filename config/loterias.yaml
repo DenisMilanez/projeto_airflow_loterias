@@ -144,6 +144,7 @@ normalizacao:
       "PALCO PRINCIPAL - SÃO JOÃO": []
       "PARQUE DO POVO": []
       "CENTRO DE TRADIÇÕES NORDESTINAS": []
+      "NAO INFORMADO": []
 
   municipio:
     similaridade_minima: 0.8

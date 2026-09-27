@@ -36,7 +36,8 @@ from loterias.db import conexao
 from loterias.log import aviso, evento, log, secao, set_context
 from loterias.silver.ibge import corrigir_municipio
 from loterias.silver.ibge import lookup_uf as _ibge_lookup_uf
-from loterias.silver.normalizacao import nome_local_sorteio
+from loterias.silver.moeda import arrecadacao_informada, em_reais
+from loterias.silver.normalizacao import LOCAL_NAO_INFORMADO, nome_local_sorteio
 
 _CANAL_ELETRONICO_VARIANTES: set[str] = canal_eletronico_variantes()
 _CANAL_ELETRONICO_MUN: str = canal_eletronico_municipio_canonico()
@@ -153,6 +154,24 @@ def _detectar_modalidade_por_payload(payloads: list[dict]) -> str:
     return "MEGA_SENA"
 
 
+COLUNAS_MONETARIAS = (
+    "valor_arrecadado",
+    "valor_estimado_proximo_concurso",
+    "valor_acumulado_proximo_concurso",
+    "valor_acumulado_concurso_especial",
+    "valor_acumulado_concurso_0_5",
+    "valor_saldo_reserva_garantidora",
+    "valor_total_premio_faixa_um",
+    "valor_premio",
+    "valor_total",
+)
+
+
+def _com_valores_numericos(linhas: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(linhas)
+    return df.astype({c: "float64" for c in COLUNAS_MONETARIAS if c in df.columns})
+
+
 def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
     modalidade = _detectar_modalidade_por_payload(payloads)
     tipo_jogo = pd.DataFrame(
@@ -179,6 +198,7 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
     for p in payloads:
         num = int(p["numero"])
         codigo = modalidade
+        data_apuracao = parse_data_br(p.get("dataApuracao"))
 
         mun_sorteio, uf_sorteio = (None, None)
         parsed = parse_municipio_uf(p.get("nomeMunicipioUFSorteio"))
@@ -190,7 +210,8 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
             }
 
         nome_local = nome_local_sorteio(p.get("localSorteio"))
-        if nome_local and mun_sorteio and uf_sorteio:
+        if mun_sorteio and uf_sorteio:
+            nome_local = nome_local or LOCAL_NAO_INFORMADO
             local_sorteio_map[(nome_local, mun_sorteio, uf_sorteio)] = {
                 "nome": nome_local,
                 "municipio": mun_sorteio,
@@ -215,11 +236,12 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
                     "codigo_tipo_jogo": codigo,
                     "numero_faixa": nf,
                     "numero_ganhadores": item.get("numeroDeGanhadores"),
-                    "valor_premio": item.get("valorPremio"),
-                    "valor_total": (
+                    "valor_premio": em_reais(item.get("valorPremio"), data_apuracao),
+                    "valor_total": em_reais(
                         (item.get("valorPremio") or 0) * (item.get("numeroDeGanhadores") or 0)
                         if item.get("numeroDeGanhadores")
-                        else item.get("valorPremio")
+                        else item.get("valorPremio"),
+                        data_apuracao,
                     ),
                 }
             )
@@ -290,7 +312,7 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
             {
                 "numero_concurso": num,
                 "codigo_tipo_jogo": codigo,
-                "data_apuracao": parse_data_br(p.get("dataApuracao")),
+                "data_apuracao": data_apuracao,
                 "data_proximo_concurso": parse_data_br(p.get("dataProximoConcurso")),
                 "numero_concurso_anterior": none_if_zero(p.get("numeroConcursoAnterior")),
                 "numero_concurso_proximo": none_if_zero(p.get("numeroConcursoProximo")),
@@ -304,13 +326,27 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
                 "tipo_publicacao": p.get("tipoPublicacao"),
                 "numero_jogo": p.get("numeroJogo"),
                 "observacao": p.get("observacao"),
-                "valor_arrecadado": p.get("valorArrecadado"),
-                "valor_estimado_proximo_concurso": p.get("valorEstimadoProximoConcurso"),
-                "valor_acumulado_proximo_concurso": p.get("valorAcumuladoProximoConcurso"),
-                "valor_acumulado_concurso_especial": p.get("valorAcumuladoConcursoEspecial"),
-                "valor_acumulado_concurso_0_5": p.get("valorAcumuladoConcurso_0_5"),
-                "valor_saldo_reserva_garantidora": p.get("valorSaldoReservaGarantidora"),
-                "valor_total_premio_faixa_um": p.get("valorTotalPremioFaixaUm"),
+                "valor_arrecadado": arrecadacao_informada(
+                    em_reais(p.get("valorArrecadado"), data_apuracao)
+                ),
+                "valor_estimado_proximo_concurso": em_reais(
+                    p.get("valorEstimadoProximoConcurso"), data_apuracao
+                ),
+                "valor_acumulado_proximo_concurso": em_reais(
+                    p.get("valorAcumuladoProximoConcurso"), data_apuracao
+                ),
+                "valor_acumulado_concurso_especial": em_reais(
+                    p.get("valorAcumuladoConcursoEspecial"), data_apuracao
+                ),
+                "valor_acumulado_concurso_0_5": em_reais(
+                    p.get("valorAcumuladoConcurso_0_5"), data_apuracao
+                ),
+                "valor_saldo_reserva_garantidora": em_reais(
+                    p.get("valorSaldoReservaGarantidora"), data_apuracao
+                ),
+                "valor_total_premio_faixa_um": em_reais(
+                    p.get("valorTotalPremioFaixaUm"), data_apuracao
+                ),
             }
         )
 
@@ -319,9 +355,9 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
         "faixa": pd.DataFrame(list(faixas_map.values())),
         "localidade": pd.DataFrame(list(localidades_map.values())),
         "local_sorteio": pd.DataFrame(list(local_sorteio_map.values())),
-        "concurso": pd.DataFrame(concursos),
+        "concurso": _com_valores_numericos(concursos),
         "dezena": pd.DataFrame(dezenas),
-        "rateio": pd.DataFrame(rateios),
+        "rateio": _com_valores_numericos(rateios),
         "ganhador_municipio": pd.DataFrame(ganhadores),
     }
 
@@ -376,7 +412,7 @@ def fetch_arquivos_pendentes(modalidade: str | None = None) -> list[tuple[int, s
 
 
 def carregar_payloads_bronze(caminho: str) -> list[dict]:
-    bronze_path = Path(caminho)
+    bronze_path = caminhos.localizar(caminho)
     if not bronze_path.is_file():
         raise FileNotFoundError(f"Bronze nao encontrado: {bronze_path}")
     df = pd.read_parquet(bronze_path)
@@ -416,7 +452,7 @@ def update_status_arquivo(
 
 
 def processar_arquivo(id_arquivo: int, caminho: str, payloads: list[dict] | None = None) -> None:
-    bronze_path = Path(caminho)
+    bronze_path = caminhos.localizar(caminho)
     if not bronze_path.is_file():
         raise FileNotFoundError(f"Bronze nao encontrado: {bronze_path}")
 

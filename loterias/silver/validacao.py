@@ -19,7 +19,7 @@ SCHEMA_CONCURSO = DataFrameSchema(
         "localidade_uf": Column(str, UF_VALIDA, nullable=True),
         "localidade_municipio": Column(str, nullable=True),
         "acumulado": Column(bool),
-        "valor_arrecadado": Column(float, Check.ge(0), nullable=True),
+        "valor_arrecadado": Column(float, Check.gt(0), nullable=True),
     },
     strict=False,
     unique=["numero_concurso", "codigo_tipo_jogo"],

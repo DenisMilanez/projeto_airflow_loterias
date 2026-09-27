@@ -6,6 +6,8 @@ from functools import cache
 
 from loterias.config import local_sorteio_canonicos, local_sorteio_invalidos
 
+LOCAL_NAO_INFORMADO = "NAO INFORMADO"
+
 
 def chave(texto: str) -> str:
     sem_acento = unicodedata.normalize("NFKD", texto).encode("ascii", "ignore").decode()
