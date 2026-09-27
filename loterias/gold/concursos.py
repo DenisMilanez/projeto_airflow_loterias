@@ -110,7 +110,7 @@ class GoldLoader:
         self.conn = emprestar()
         self.tipo_jogo: dict[str, int] = {}
         self.localidade: dict[tuple[str, str], int] = {}
-        self.faixa: dict[tuple[int, int], int] = {}
+        self.faixa: dict[tuple[int, int, int], int] = {}
         self.local_sorteio: dict[tuple[str, int], int] = {}
         self.concurso: dict[tuple[int, int], int] = {}
         self._hydrate_tipo_jogo()
@@ -132,9 +132,9 @@ class GoldLoader:
 
     def _refresh_faixa_cache(self) -> None:
         with self.conn.cursor() as cur:
-            cur.execute("SELECT id_faixa, id_tipo_jogo, numero_faixa FROM public.faixa")
-            for fid, tid, nf in cur.fetchall():
-                self.faixa[(int(tid), int(nf))] = int(fid)
+            cur.execute("SELECT id_faixa, id_tipo_jogo, numero_faixa, acertos FROM public.faixa")
+            for fid, tid, nf, ac in cur.fetchall():
+                self.faixa[(int(tid), int(nf), int(ac))] = int(fid)
 
     def _refresh_local_sorteio_cache(self) -> None:
         with self.conn.cursor() as cur:
@@ -198,10 +198,10 @@ class GoldLoader:
         rows = []
         for _, r in df.iterrows():
             tid = self.tipo_jogo[str(r["codigo_tipo_jogo"])]
-            nf = int(r["numero_faixa"])
-            if (tid, nf) in self.faixa:
+            chave = (tid, int(r["numero_faixa"]), int(r["acertos"]))
+            if chave in self.faixa:
                 continue
-            rows.append((tid, nf, r.get("descricao"), int(r["acertos"])))
+            rows.append((chave[0], chave[1], r.get("descricao"), chave[2]))
         if not rows:
             return
         with self.conn.cursor() as cur:
@@ -210,7 +210,7 @@ class GoldLoader:
                 """
                 INSERT INTO public.faixa (id_tipo_jogo, numero_faixa, descricao, acertos)
                 VALUES (%s, %s, %s, %s)
-                ON CONFLICT (id_tipo_jogo, numero_faixa) DO NOTHING
+                ON CONFLICT (id_tipo_jogo, numero_faixa, acertos) DO NOTHING
                 """,
                 rows,
             )
@@ -388,7 +388,7 @@ class GoldLoader:
         for _, r in df_rat.iterrows():
             tid = self.tipo_jogo[str(r["codigo_tipo_jogo"])]
             cid = self.concurso[(tid, int(r["numero_concurso"]))]
-            fid = self.faixa[(tid, int(r["numero_faixa"]))]
+            fid = self.faixa[(tid, int(r["numero_faixa"]), int(r["acertos"]))]
             rat_rows.append(
                 (
                     cid,

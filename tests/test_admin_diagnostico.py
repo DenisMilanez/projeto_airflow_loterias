@@ -49,12 +49,11 @@ def test_constraint_de_local_sorteio_existe(conexao_banco):
     assert any("nome" in c and "id_localidade" in c for c in local.unicidade)
 
 
-def test_faixa_tem_unicidade_por_numero_e_nao_por_acertos(conexao_banco):
+def test_faixa_nao_e_identificada_so_pelos_acertos(conexao_banco):
     integridade = esquema.verificar()
     faixa_tabela = next(t for t in integridade.tabelas if t.nome == "faixa")
-    assinaturas = " ".join(faixa_tabela.unicidade)
-    assert "numero_faixa" in assinaturas
-    assert "acertos" not in assinaturas
+    assert any("numero_faixa" in u for u in faixa_tabela.unicidade)
+    assert not any(u.endswith("(id_tipo_jogo, acertos)") for u in faixa_tabela.unicidade)
 
 
 @pytest.mark.parametrize("funcao", [fila.erros, fila.detalhe, fila.faixa])

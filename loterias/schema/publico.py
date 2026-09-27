@@ -27,7 +27,7 @@ PUBLIC_TABLES: list[tuple[str, str]] = [
             numero_faixa SMALLINT NOT NULL,
             descricao VARCHAR(120),
             acertos SMALLINT NOT NULL,
-            CONSTRAINT uq_faixa_tipo_numero UNIQUE (id_tipo_jogo, numero_faixa)
+            CONSTRAINT uq_faixa_tipo_numero_acertos UNIQUE (id_tipo_jogo, numero_faixa, acertos)
         );
         """,
     ),
@@ -166,6 +166,21 @@ PUBLIC_TABLES: list[tuple[str, str]] = [
 ]
 
 
+AJUSTES_EM_BANCO_EXISTENTE = [
+    "ALTER TABLE faixa DROP CONSTRAINT IF EXISTS uq_faixa_tipo_numero",
+    """
+    DO $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_faixa_tipo_numero_acertos') THEN
+            ALTER TABLE faixa ADD CONSTRAINT uq_faixa_tipo_numero_acertos
+                UNIQUE (id_tipo_jogo, numero_faixa, acertos);
+        END IF;
+    END
+    $$
+    """,
+]
+
+
 def table_exists(cur, name: str) -> bool:
     cur.execute(
         """
@@ -206,6 +221,8 @@ def main() -> int:
                     print(f"  (PG<15: removendo NULLS NOT DISTINCT em {name})")
                 print(f"Criando public.{name} ...")
                 cur.execute(ddl_final)
+            for ajuste in AJUSTES_EM_BANCO_EXISTENTE:
+                cur.execute(ajuste)
 
         conn.commit()
         print("Concluido (commit).")

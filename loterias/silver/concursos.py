@@ -187,7 +187,7 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
         ]
     )
 
-    faixas_map: dict[tuple[int, str], dict] = {}
+    faixas_map: dict[tuple[int, int, str], dict] = {}
     localidades_map: dict[tuple[str, str], dict] = {}
     local_sorteio_map: dict[tuple[str, str, str], dict] = {}
     concursos: list[dict] = []
@@ -222,19 +222,21 @@ def transform_payloads(payloads: list[dict]) -> dict[str, pd.DataFrame]:
             nf = int(item["faixa"])
             desc = item.get("descricaoFaixa")
             acertos = parse_acertos(desc)
-            key = (nf, codigo)
+            acertos = acertos if acertos is not None else 0
+            key = (nf, acertos, codigo)
             if key not in faixas_map:
                 faixas_map[key] = {
                     "codigo_tipo_jogo": codigo,
                     "numero_faixa": nf,
                     "descricao": desc,
-                    "acertos": acertos if acertos is not None else 0,
+                    "acertos": acertos,
                 }
             rateios.append(
                 {
                     "numero_concurso": num,
                     "codigo_tipo_jogo": codigo,
                     "numero_faixa": nf,
+                    "acertos": acertos,
                     "numero_ganhadores": item.get("numeroDeGanhadores"),
                     "valor_premio": em_reais(item.get("valorPremio"), data_apuracao),
                     "valor_total": em_reais(

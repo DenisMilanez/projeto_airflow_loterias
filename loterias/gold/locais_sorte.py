@@ -111,7 +111,9 @@ class LocaisGoldLoader:
 
     def _hydrate_faixa(self) -> None:
         with self.conn.cursor() as cur:
-            cur.execute("SELECT id_faixa, id_tipo_jogo, acertos FROM public.faixa")
+            cur.execute(
+                "SELECT id_faixa, id_tipo_jogo, acertos FROM public.faixa ORDER BY numero_faixa"
+            )
             for fid, tid, ac in cur.fetchall():
                 self.faixa_por_acertos[(int(tid), int(ac))] = int(fid)
 

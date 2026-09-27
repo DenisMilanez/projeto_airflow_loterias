@@ -45,7 +45,7 @@ def test_faixas_com_mesmos_acertos_convivem(conexao_banco):
                 """
                 INSERT INTO public.faixa (id_tipo_jogo, numero_faixa, acertos, descricao)
                 VALUES (%s, %s, %s, %s)
-                ON CONFLICT (id_tipo_jogo, numero_faixa) DO NOTHING
+                ON CONFLICT (id_tipo_jogo, numero_faixa, acertos) DO NOTHING
                 """,
                 (id_tipo_jogo, numero_faixa, 6, f"teste faixa {numero_faixa}"),
             )

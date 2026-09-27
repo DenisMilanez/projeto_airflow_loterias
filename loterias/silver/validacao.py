@@ -40,20 +40,22 @@ SCHEMA_RATEIO = DataFrameSchema(
     {
         "numero_concurso": Column(int, Check.gt(0)),
         "numero_faixa": Column(int, Check.gt(0)),
+        "acertos": Column(int, Check.ge(0)),
         "numero_ganhadores": Column(int, Check.ge(0)),
         "valor_premio": Column(float, Check.ge(0), nullable=True),
     },
     strict=False,
+    unique=["codigo_tipo_jogo", "numero_concurso", "numero_faixa"],
 )
 
 SCHEMA_FAIXA = DataFrameSchema(
     {
         "codigo_tipo_jogo": Column(str),
         "numero_faixa": Column(int, Check.gt(0)),
-        "acertos": Column(int, Check.ge(0), nullable=True),
+        "acertos": Column(int, Check.ge(0)),
     },
     strict=False,
-    unique=["codigo_tipo_jogo", "numero_faixa"],
+    unique=["codigo_tipo_jogo", "numero_faixa", "acertos"],
 )
 
 SCHEMA_LOCALIDADE = DataFrameSchema(
