@@ -1,0 +1,35 @@
+version: 2
+
+sources:
+  - name: gold
+    database: loterias
+    schema: public
+    description: Camada gold carregada pelo pipeline Python.
+    tables:
+      - name: tipo_jogo
+        columns:
+          - name: id_tipo_jogo
+            tests: [unique, not_null]
+          - name: codigo
+            tests: [unique, not_null]
+      - name: concurso
+        columns:
+          - name: id_concurso
+            tests: [unique, not_null]
+          - name: id_tipo_jogo
+            tests:
+              - not_null
+              - relationships:
+                  arguments:
+                    to: source('gold', 'tipo_jogo')
+                    field: id_tipo_jogo
+      - name: dezena
+      - name: rateio
+      - name: faixa
+      - name: localidade
+        columns:
+          - name: id_localidade
+            tests: [unique, not_null]
+      - name: ganhador_municipio
+      - name: loterica
+      - name: ganhador_loterica

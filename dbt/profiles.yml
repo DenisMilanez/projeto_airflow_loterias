@@ -1,0 +1,13 @@
+loterias:
+  target: local
+  outputs:
+    local:
+      type: postgres
+      host: "{{ env_var('LOTERIAS_DB_HOST', 'localhost') }}"
+      port: "{{ env_var('LOTERIAS_DB_PORT', '5433') | int }}"
+      user: "{{ env_var('LOTERIAS_DB_USUARIO', 'loterias') }}"
+      password: "{{ env_var('LOTERIAS_DB_SENHA', 'loterias') }}"
+      dbname: "{{ env_var('LOTERIAS_DB_NOME', 'loterias') }}"
+      schema: analytics
+      threads: 4
+      sslmode: "{{ env_var('LOTERIAS_DB_SSL_MODE', 'disable') }}"

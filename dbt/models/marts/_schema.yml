@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: mart_resumo_modalidade
+    description: Uma linha por modalidade com volumetria, arrecadacao e retorno em premios.
+    columns:
+      - name: modalidade
+        tests: [unique, not_null]
+      - name: total_concursos
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 1
+      - name: pct_acumulados
+        tests:
+          - dbt_utils.accepted_range:
+              arguments:
+                min_value: 0
+                max_value: 100
+
+  - name: mart_ganhadores_municipio
+    description: Ganhadores por municipio, UF e modalidade.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [uf, municipio, modalidade]
+    columns:
+      - name: uf
+        tests: [not_null]
+      - name: municipio
+        tests: [not_null]
+      - name: total_ganhadores
+        tests: [not_null]
+
+  - name: mart_premiacao_faixa
+    description: Estatistica de premiacao por modalidade e faixa de acertos.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [modalidade, numero_faixa]
+    columns:
+      - name: modalidade
+        tests: [not_null]
+      - name: numero_faixa
+        tests: [not_null]
+      - name: concursos_com_ganhador
+        tests: [not_null]
+
+  - name: mart_serie_mensal
+    description: Serie temporal mensal por modalidade, com arrecadacao acumulada.
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [modalidade, mes_apuracao]
+    columns:
+      - name: mes_apuracao
+        tests: [not_null]
+      - name: concursos
+        tests: [not_null]
