@@ -9,7 +9,7 @@ Camada **Gold** da arquitetura medallion — dados ja limpos e normalizados, pro
 | Tabela | Linhas | Descricao |
 |---|---:|---|
 | `tipo_jogo` | 4 | Catalogo das modalidades (Mega-Sena, Quina, etc) e suas regras (quantas dezenas sao sorteadas, apostadas e disponiveis). |
-| `faixa` | 19 | Faixas de premiacao de cada modalidade (ex: 6 acertos, 5 acertos...). O campo 'acertos' e o numero de acertos daquela faixa. |
+| `faixa` | 20 | Faixas de premiacao de cada modalidade (ex: 6 acertos, 5 acertos...). O campo 'acertos' e o numero de acertos daquela faixa. |
 | `localidade` | 5,590 | Municipio + UF. UF '--' = canal eletronico (compra online, sem cidade fisica). |
 | `local_sorteio` | 694 | Local fisico onde o sorteio ocorreu (ex: CAMINHAO DA SORTE, ESTUDIO DE TV). |
 | `concurso` | 16,958 | Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz data de apuracao, se acumulou, valores arrecadados/estimados, etc. |
@@ -75,7 +75,7 @@ Catalogo das modalidades (Mega-Sena, Quina, etc) e suas regras (quantas dezenas 
 ]
 ```
 
-### `faixa`  (19 linhas)
+### `faixa`  (20 linhas)
 
 Faixas de premiacao de cada modalidade (ex: 6 acertos, 5 acertos...). O campo 'acertos' e o numero de acertos daquela faixa.
 
@@ -197,54 +197,54 @@ Um concurso de uma modalidade. Tabela central — quase tudo se liga a ela. Traz
 ```json
 [
   {
-    "id_concurso": 7001,
-    "id_tipo_jogo": 2,
-    "numero_concurso": 1501,
-    "data_apuracao": "2005-09-20",
-    "data_proximo_concurso": "2005-09-22",
-    "numero_concurso_anterior": 1500,
-    "numero_concurso_proximo": 1502,
-    "numero_concurso_final_0_5": 1505,
-    "id_local_sorteio": 35,
+    "id_concurso": 6014,
+    "id_tipo_jogo": 3,
+    "numero_concurso": 1514,
+    "data_apuracao": "2017-05-22",
+    "data_proximo_concurso": "2017-05-24",
+    "numero_concurso_anterior": 1513,
+    "numero_concurso_proximo": 1515,
+    "numero_concurso_final_0_5": 1520,
+    "id_local_sorteio": 627,
     "acumulado": false,
     "ultimo_concurso": true,
     "indicador_concurso_especial": 1,
     "tipo_publicacao": 3,
-    "numero_jogo": 3,
-    "observacao": "Estimativa de prêmio (QUINA) para o próximo concurso, a ser realizado em 22/09/2005: R$300.000,00.",
-    "valor_arrecadado": null,
-    "valor_estimado_proximo_concurso": 0.0,
+    "numero_jogo": 8,
+    "observacao": "",
+    "valor_arrecadado": 20698336.0,
+    "valor_estimado_proximo_concurso": 1700000.0,
     "valor_acumulado_proximo_concurso": 0.0,
-    "valor_acumulado_concurso_especial": 0.0,
+    "valor_acumulado_concurso_especial": 43013340.03,
     "valor_acumulado_concurso_0_5": 0.0,
     "valor_saldo_reserva_garantidora": 0.0,
     "valor_total_premio_faixa_um": 0.0,
-    "created_at": "2026-09-12T23:28:42.120251+00:00"
+    "created_at": "2026-09-12T23:28:27.192557+00:00"
   },
   {
-    "id_concurso": 7002,
-    "id_tipo_jogo": 2,
-    "numero_concurso": 1502,
-    "data_apuracao": "2005-09-22",
-    "data_proximo_concurso": "2005-09-24",
-    "numero_concurso_anterior": 1501,
-    "numero_concurso_proximo": 1503,
-    "numero_concurso_final_0_5": 1505,
-    "id_local_sorteio": 35,
-    "acumulado": true,
+    "id_concurso": 6015,
+    "id_tipo_jogo": 3,
+    "numero_concurso": 1515,
+    "data_apuracao": "2017-05-24",
+    "data_proximo_concurso": "2017-05-26",
+    "numero_concurso_anterior": 1514,
+    "numero_concurso_proximo": 1516,
+    "numero_concurso_final_0_5": 1520,
+    "id_local_sorteio": 460,
+    "acumulado": false,
     "ultimo_concurso": true,
     "indicador_concurso_especial": 1,
     "tipo_publicacao": 3,
-    "numero_jogo": 3,
-    "observacao": "Acumulou!! Estimativa de prêmio (QUINA) para o próximo concurso, a ser realizado em 24/09/2005: R$700.000,00.",
-    "valor_arrecadado": null,
-    "valor_estimado_proximo_concurso": 0.0,
-    "valor_acumulado_proximo_concurso": 307887.3,
-    "valor_acumulado_concurso_especial": 0.0,
+    "numero_jogo": 8,
+    "observacao": "",
+    "valor_arrecadado": 20445844.0,
+    "valor_estimado_proximo_concurso": 1700000.0,
+    "valor_acumulado_proximo_concurso": 0.0,
+    "valor_acumulado_concurso_especial": 43401529.08,
     "valor_acumulado_concurso_0_5": 0.0,
     "valor_saldo_reserva_garantidora": 0.0,
     "valor_total_premio_faixa_um": 0.0,
-    "created_at": "2026-09-12T23:28:42.120251+00:00"
+    "created_at": "2026-09-12T23:28:27.192557+00:00"
   }
 ]
 ```
@@ -303,20 +303,20 @@ Resultado financeiro por faixa de premiacao de cada concurso: quantos ganhadores
 ```json
 [
   {
-    "id_rateio": 27767,
-    "id_concurso": 6454,
-    "id_faixa": 14,
-    "numero_ganhadores": 234,
-    "valor_premio": 2063.73,
-    "valor_total": 482912.82
+    "id_rateio": 267962,
+    "id_concurso": 10872,
+    "id_faixa": 4,
+    "numero_ganhadores": 1146,
+    "valor_premio": 247.58,
+    "valor_total": 283726.68
   },
   {
-    "id_rateio": 27768,
-    "id_concurso": 6454,
-    "id_faixa": 15,
-    "numero_ganhadores": 9154,
-    "valor_premio": 25.0,
-    "valor_total": 228850.0
+    "id_rateio": 267963,
+    "id_concurso": 10872,
+    "id_faixa": 5,
+    "numero_ganhadores": 6307,
+    "valor_premio": 44.98,
+    "valor_total": 283688.86
   }
 ]
 ```

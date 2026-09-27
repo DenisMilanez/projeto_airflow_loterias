@@ -238,3 +238,17 @@ sentido comparando os dois no mesmo conjunto de concursos.
 **Local do sorteio vazio.** Quando a API manda a cidade mas não o nome do
 local, o silver registra o local `NAO INFORMADO` naquela cidade, para a cidade
 não se perder (393 concursos).
+
+---
+
+## 11. A numeração das faixas muda com o tempo
+
+O número da faixa (`faixa` em `listaRateioPremio`) não é uma identidade
+estável. Na Lotomania, a partir do concurso 1653, a Caixa criou a faixa de
+15 acertos com o número 6 e passou o "0 acertos", que era a 6, para a 7.
+
+A identidade real de uma faixa é o par número + descrição de acertos. O
+pipeline usa esse par em todas as camadas; uma verificação que pega a
+confusão é conferir que nenhum concurso tem duas faixas com o mesmo número
+de acertos. Isso vale para as quatro modalidades ativas — a Dupla Sena, que
+tem dois sorteios por concurso, vai exigir outra chave quando for ativada.

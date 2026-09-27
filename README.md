@@ -408,6 +408,33 @@ O registro passou a guardar o caminho relativo à raiz do projeto
 antigos (`loterias/caminhos.py`). Os 653 registros existentes foram
 normalizados, e `tests/test_caminhos.py` trava os três formatos.
 
+### 12. A Lotomania pagava prêmio de "0 acertos" a 27 milhões de pessoas
+
+Montando o dashboard, a Lotomania apareceu com duas faixas chamadas
+"0 acertos", uma delas com 27,6 milhões de ganhadores. Acertar zero de vinte
+números é tão raro quanto acertar os vinte, então o número era impossível.
+
+A causa: no concurso 1653 a Caixa criou a faixa de 15 acertos, deu a ela o
+número 6 e empurrou o "0 acertos" para o número 7. O banco identificava cada
+faixa só pelo número e guardou a primeira descrição que viu — então os
+prêmios de 15 acertos de 1.328 concursos ficaram rotulados como 0 acertos.
+
+| Concursos | Faixa 6 | Faixa 7 |
+|---|---|---|
+| 1 a 1652 | 0 acertos | — |
+| 1653 em diante | 15 acertos | 0 acertos |
+
+A faixa passou a ser identificada por número e acertos: a regra de
+unicidade do banco virou `(id_tipo_jogo, numero_faixa, acertos)`, o silver
+leva os acertos junto de cada prêmio, e o gold liga o prêmio à faixa certa.
+Os rateios da Lotomania foram apagados e recarregados do bronze — 72.171
+linhas antes e depois, com o mesmo total de ganhadores e o mesmo valor pago.
+
+O mart de premiação passou a ter uma linha por número de acertos, então os
+dois "0 acertos" viram um só para quem lê. O teste que pegou o bug é simples:
+nenhum concurso pode ter duas faixas com os mesmos acertos
+(`tests/test_faixa_renumerada.py`).
+
 ---
 
 ## CLI de administração
@@ -519,15 +546,18 @@ cd dbt && dbt deps && dbt build
 |---|---|
 | `mart_resumo_modalidade` | modalidade |
 | `mart_ganhadores_municipio` | uf + município + modalidade |
-| `mart_premiacao_faixa` | modalidade + faixa |
+| `mart_premiacao_faixa` | modalidade + acertos |
 | `mart_serie_mensal` | modalidade + mês |
 
-São 30 testes dbt: `unique`, `not_null`, `relationships`,
-`unique_combination_of_columns` e `accepted_range`. Detalhes em
+São 33 testes dbt: `unique`, `not_null`, `relationships`,
+`unique_combination_of_columns`, `accepted_range` e `expression_is_true`. Detalhes em
 [dbt/README.md](dbt/README.md).
 
 O retorno em prêmios compara prêmios e arrecadação só nos concursos que têm os
-dois, porque a Caixa só informa a arrecadação a partir de 2009. O próprio dbt
+dois, porque a Caixa só informa a arrecadação a partir de 2009. O mart de
+premiação traz média e mediana do prêmio por ganhador: na faixa principal da
+Quina a média é R$ 1,41 milhão e a mediana R$ 161 mil, porque poucos prêmios
+gigantes puxam a média para cima. O próprio dbt
 concede leitura ao usuário `metabase`, que é o que ferramentas de BI usam.
 
 ---

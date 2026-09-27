@@ -85,6 +85,12 @@ O esquema do banco já está preparado para a Dupla Sena: a coluna
 `dezena.segundo_sorteio` existe e a constraint que impedia faixas com o mesmo
 número de acertos foi removida (ver bug 3 no README).
 
+Falta uma peça: a faixa é identificada por número e acertos (bug 12), e a
+Dupla Sena repete os acertos entre o primeiro e o segundo sorteio. Ao
+reativá-la, a chave da faixa precisa incluir o sorteio, e a carga de locais
+da sorte, que liga ganhador à faixa pelos acertos, precisa saber de qual
+sorteio é o prêmio.
+
 ---
 
 ## Por que o primeiro concurso com locais da sorte varia por modalidade
