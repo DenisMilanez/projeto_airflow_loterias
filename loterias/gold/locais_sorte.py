@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 from psycopg2.extras import execute_batch
 
+from loterias import caminhos
 from loterias.config import id_tipo_jogo as cfg_id_tipo_jogo
 from loterias.db import conexao, devolver, emprestar
 from loterias.gold import normalizacao
@@ -350,7 +351,7 @@ def main() -> int:
                 loaders_por_modalidade[modal] = LocaisGoldLoader(id_tj)
             loader = loaders_por_modalidade[modal]
 
-            silver_dir = bronze_to_silver_dir(Path(caminho))
+            silver_dir = bronze_to_silver_dir(caminhos.localizar(caminho))
             if not silver_dir.is_dir():
                 msg = f"pasta silver nao encontrada: {silver_dir}"
                 aviso(msg)

@@ -197,7 +197,7 @@ def db_register_arquivo(id_execucao: int, path: Path, ci: int, cf: int, total: i
                 ) VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING id_arquivo
                 """,
-                (id_execucao, str(path.resolve()), ci, cf, total, FONTE),
+                (id_execucao, caminhos.registrar(path), ci, cf, total, FONTE),
             )
             id_arquivo = cur.fetchone()[0]
         conn.commit()

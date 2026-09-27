@@ -72,7 +72,7 @@ def registrar_bronze(
                     continue
                 ini, fim = int(achado.group("ini")), int(achado.group("fim"))
                 total = _contar_linhas(parquet, "numero_concurso", ini, fim)
-                registros.append((str(parquet.resolve()), ini, fim, total))
+                registros.append((caminhos.registrar(parquet), ini, fim, total))
                 resultado.linhas += total
                 concursos.update(range(ini, fim + 1))
 

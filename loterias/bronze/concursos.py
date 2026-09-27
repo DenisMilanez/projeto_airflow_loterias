@@ -300,7 +300,7 @@ def db_insert_execucao_e_arquivos(
                     ) VALUES (%s, %s, %s, %s, %s, %s)
                     """,
                     [
-                        (id_exec, str(p.resolve()), ci, cf, total, "concursos")
+                        (id_exec, caminhos.registrar(p), ci, cf, total, "concursos")
                         for p, ci, cf, total in arquivos
                     ],
                     page_size=100,

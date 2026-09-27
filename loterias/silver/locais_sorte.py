@@ -163,7 +163,7 @@ def transform_payloads(
 
 
 def processar_arquivo(caminho: str) -> None:
-    bronze_path = Path(caminho)
+    bronze_path = caminhos.localizar(caminho)
     if not bronze_path.is_file():
         raise FileNotFoundError(f"Bronze nao encontrado: {bronze_path}")
 

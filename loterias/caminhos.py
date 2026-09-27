@@ -21,6 +21,18 @@ def bronze() -> Path:
     return dados() / "bronze"
 
 
+def registrar(caminho: Path) -> str:
+    return Path(caminho).resolve().relative_to(raiz()).as_posix()
+
+
+def localizar(registrado: str) -> Path:
+    normalizado = str(registrado).replace("\\", "/")
+    _, marcador, resto = normalizado.partition("data/bronze/")
+    if marcador:
+        return bronze() / resto
+    return raiz() / normalizado
+
+
 def silver() -> Path:
     return dados() / "silver"
 
