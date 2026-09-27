@@ -1,0 +1,167 @@
+jogos:
+  MEGA_SENA:
+    id_tipo_jogo: 1
+    codigo_api: megasena
+    nome_exibicao: "Mega-Sena"
+    dezenas_sorteadas: 6
+    dezenas_apostadas: 6
+    dezenas_disponiveis: 60
+    dias_sorteio: [1, 3, 5]
+    concursos:
+      batch_parquet: 500
+      historico_chunk_http: 200
+      historico_semaforo: 5
+      incremental_janela: 5
+      incremental_stop_consecutivos: 4
+      incremental_semaforo: 3
+    locais_sorte:
+      concurso_min: 2296
+      request_sleep: 4.0
+      pausa_apos_429_s: 60
+      pausa_apos_403_s: 60
+      max_retries_inline: 3
+      batch_parquet: 10
+
+  QUINA:
+    id_tipo_jogo: 2
+    codigo_api: quina
+    nome_exibicao: "Quina"
+    dezenas_sorteadas: 5
+    dezenas_apostadas: 5
+    dezenas_disponiveis: 80
+    dias_sorteio: [0, 1, 2, 3, 4, 5]
+    concursos:
+      batch_parquet: 500
+      historico_chunk_http: 200
+      historico_semaforo: 5
+      incremental_janela: 5
+      incremental_stop_consecutivos: 4
+      incremental_semaforo: 3
+    locais_sorte:
+      concurso_min: 5358
+      request_sleep: 4.0
+      pausa_apos_429_s: 60
+      pausa_apos_403_s: 60
+      max_retries_inline: 3
+      batch_parquet: 10
+
+  LOTOFACIL:
+    id_tipo_jogo: 3
+    codigo_api: lotofacil
+    nome_exibicao: "Lotofácil"
+    dezenas_sorteadas: 15
+    dezenas_apostadas: 15
+    dezenas_disponiveis: 25
+    dias_sorteio: [0, 1, 2, 3, 4, 5]
+    concursos:
+      batch_parquet: 500
+      historico_chunk_http: 200
+      historico_semaforo: 5
+      incremental_janela: 5
+      incremental_stop_consecutivos: 4
+      incremental_semaforo: 3
+    locais_sorte:
+      concurso_min: 2028
+      request_sleep: 4.0
+      pausa_apos_429_s: 60
+      pausa_apos_403_s: 60
+      max_retries_inline: 3
+      batch_parquet: 10
+
+  LOTOMANIA:
+    id_tipo_jogo: 4
+    codigo_api: lotomania
+    nome_exibicao: "Lotomania"
+    dezenas_sorteadas: 20
+    dezenas_apostadas: 50
+    dezenas_disponiveis: 100
+    dias_sorteio: [1, 3, 5]
+    concursos:
+      batch_parquet: 500
+      historico_chunk_http: 200
+      historico_semaforo: 5
+      incremental_janela: 5
+      incremental_stop_consecutivos: 4
+      incremental_semaforo: 3
+    locais_sorte:
+      concurso_min: 2106
+      request_sleep: 4.0
+      pausa_apos_429_s: 60
+      pausa_apos_403_s: 60
+      max_retries_inline: 3
+      batch_parquet: 10
+
+fila:
+  max_tentativas: 10
+  backoff_horas_por_tentativa: [6, 12, 24, 48, 48, 72, 72, 96, 96, 168]
+
+normalizacao:
+  canal_eletronico:
+    municipio_canonico: "CANAL ELETRONICO"
+    uf_canonica: "--"
+    variantes_municipio:
+      - "CANAL ELETRONICO"
+      - "CANAL DIGITAL"
+      - "CANAIS ELETRONICOS"
+      - "INTERNET BANKING"
+      - "LOTERIAS EM CANAIS ELETRONICOS"
+
+  local_sorteio:
+    invalidos:
+      - "QUINA"
+    canonicos:
+      "CAMINHÃO DA SORTE":
+        - "CAINHAO DA SORTE"
+        - "CAMINHAO DE SORTE"
+        - "CAMINHAO DO SORTE"
+        - "CAMINHAO DA SORTE09"
+        - "CAMINHAO DA CAIXA"
+        - "CAMINHAO DO"
+        - "CAMINHAO"
+      "ESPAÇO DA SORTE": []
+      "ESPAÇO LOTERIAS CAIXA":
+        - "ESPACO LOTERIAS"
+        - "ESPACO LOTERIA CAIXA"
+        - "ESPACO LOTERIAS CAICA"
+        - "ESPACO LOTERIAS SORTE"
+        - "ESPACO LOETRIAS CAIXA"
+        - "ESPACO LOOTERIAS CAIXA"
+        - "ESPCAO LOTERIAS CAIXA"
+        - "ESAPCO LOTERIAS CAIXA"
+        - "ESPCACO LOTERIAS CAIXA"
+        - "ESPACO CAIXA LOTERIAS"
+        - "ESPACO CAIXA LOTERIA"
+        - "ESPACO CAIXA LOTERAIS"
+      "AUDITÓRIO": []
+      "AUDITÓRIO DA CAIXA": []
+      "AUDITÓRIO 512 NORTE": []
+      "ESTÚDIO DE TV":
+        - "ESTUDIO TV"
+      "ESTÚDIO DE TV REDE GLOBO":
+        - "ESTUDIO DE TV GLOBO"
+        - "ESTUDIO REDE GLOBO"
+        - "ESTUDIO DE TV REDE GLOBO SP"
+      "PALCO PRINCIPAL - SÃO JOÃO": []
+      "PARQUE DO POVO": []
+      "CENTRO DE TRADIÇÕES NORDESTINAS": []
+
+  municipio:
+    similaridade_minima: 0.8
+    folga_sobre_segundo: 0.05
+    correcoes:
+      "ACU/RN": "ASSU/RN"
+      "ARES/RN": "AREZ/RN"
+      "AUGUSTO SEVERO/RN": "CAMPO GRANDE/RN"
+      "SAO VALERIO DA NATIVIDADE/TO": "SAO VALERIO/TO"
+      "FORTALEZA DO TABOCAO/TO": "TABOCAO/TO"
+      "ARROIO DO SILVA/SC": "BALNEARIO ARROIO DO SILVA/SC"
+      "EMBU/SP": "EMBU DAS ARTES/SP"
+      "SAO LUIZ/RR": "SAO LUIZ DO ANAUA/RR"
+      "VICENTE DE CARVALHO/SP": "GUARUJA/SP"
+      "MUQUEM (NIQUELANDIA)/GO": "NIQUELANDIA/GO"
+      "MUQUEM/GO": "NIQUELANDIA/GO"
+      "GAMA/DF": "BRASILIA/DF"
+      "TAGUATINGA/DF": "BRASILIA/DF"
+      "BRASILIA/SP": "BRASILIA/DF"
+      "CERQUILHO/ES": "CERQUILHO/SP"
+      "GOIANA/GO": "GOIANIA/GO"
